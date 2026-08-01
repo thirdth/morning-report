@@ -7,7 +7,7 @@ A local app that scans `~/Downloads`, scores every file by how deletable it look
 This isn't packaged for distribution — it's the actual script running on my machine, published so the code is readable. A few things make that concrete:
 
 - **macOS only.** File deletion goes through the Trash via `osascript`/AppleScript, the daily trigger is a `launchd` plist, and the installer builds a native `.app` bundle with `iconutil`. None of that exists on Linux or Windows.
-- **The launchd plist has my username hardcoded** (`/Users/zacharyglaser/...`), because `launchd` daemons don't expand `$HOME`. Anyone running this needs to open `com.morningreport.plist` and swap in their own path.
+- **The launchd plist needs a real absolute path**, because `launchd` daemons don't expand `$HOME`. `com.morningreport.plist` ships with a `YOUR_USERNAME` placeholder — swap it for your own before loading the job.
 - **No installer wizard, no packaging, no auto-update.** Config lives in a JSON file you edit by hand or through the app's own settings panel.
 
 If any of this is useful, treat it as a reference to fork and rewrite for your own machine, not a `git clone && run`.
@@ -37,9 +37,9 @@ Theme follows your OS light/dark setting by default, with a manual override (`au
 ## Setup
 
 1. Clone this repo somewhere on your machine.
-2. Edit `com.morningreport.plist` — replace every `/Users/zacharyglaser/morning-report` with your own path.
-3. Run `install_app.sh`. It builds `Morning Report.app`, installs it to `/Applications`, and installs the `launchd` job.
-4. Launch the app once, open `[ config ]`, and set your Anthropic API key and Downloads folder path.
+2. Run `install_app.sh`. It builds `Morning Report.app` and installs it to `/Applications` — launch it by hand from there whenever you want to run a session.
+3. Launch the app once, open `[ config ]`, and set your Anthropic API key and Downloads folder path.
+4. For the automatic 8am trigger: edit `com.morningreport.plist`, replacing every `YOUR_USERNAME` with your own, then `cp` it to `~/Library/LaunchAgents/` and `launchctl load ~/Library/LaunchAgents/com.morningreport.plist`. This step is optional — skip it if you're fine opening the app manually.
 
 Config is stored in `~/.morning_report_config.json` (not tracked in this repo).
 
