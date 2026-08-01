@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- Label must match the filename -->
+  <key>Label</key>
+  <string>com.morningreport</string>
+
+  <!-- Path to Python and the script. Update zacharyglaser below. -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/python3</string>
+    <string>/Users/zacharyglaser/morning-report/morning_report.py</string>
+  </array>
+
+  <!-- Run at 8:00 AM every day -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>8</integer>
+    <key>Minute</key>
+    <integer>0</integer>
+  </dict>
+
+  <!-- Log output (optional, useful for debugging) -->
+  <key>StandardOutPath</key>
+  <string>/Users/zacharyglaser/morning-report/launch.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/zacharyglaser/morning-report/launch_error.log</string>
+
+  <!-- Run whether or not user is logged in -->
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>
