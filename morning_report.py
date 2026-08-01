@@ -486,6 +486,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     margin-right: 0;
   }
   .save-btn:hover { color: var(--text); border-bottom-color: var(--dim); }
+  .quit-btn { margin-left: 20px; }
+  .quit-btn:hover { color: var(--danger); border-bottom-color: var(--danger); }
   .toast {
     position: fixed;
     bottom: 24px;
@@ -562,6 +564,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <input type="password" id="cfg_anthropic_api_key" placeholder="sk-ant-...">
   </div>
   <button class="save-btn" onclick="saveSettings()">[ save &amp; restart ]</button>
+  <button class="save-btn quit-btn" onclick="quitApp()">[ quit ]</button>
 </div>
 
 <div id="cardContainer"></div>
@@ -762,6 +765,13 @@ async function saveSettings() {
   setTimeout(() => location.reload(), 800);
 }
 
+async function quitApp() {
+  if (!confirm("Quit Morning Report? Reopen it from the Dock tomorrow.")) return;
+  await fetch("/api/quit", { method: "POST" });
+  document.body.innerHTML =
+    '<p style="font-family:' + getComputedStyle(document.body).fontFamily + ';color:var(--muted);padding:56px 24px;">morning report has quit. see you tomorrow.</p>';
+}
+
 // ── Utils ─────────────────────────────────────────────────────────────────────
 function escHtml(s) {
   return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
@@ -793,6 +803,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", len(body))
         self.end_headers()
         self.wfile.write(body)
+        self.wfile.flush()
 
     def read_json_body(self):
         length = int(self.headers.get("Content-Length", 0))
@@ -844,6 +855,12 @@ class Handler(BaseHTTPRequestHandler):
             save_config(Handler.config_cache)
             Handler.files_cache = None  # bust cache
             self.send_json({"ok": True})
+
+        elif path == "/api/quit":
+            self.send_json({"ok": True})
+            # respond first, then exit — os._exit skips cleanup/atexit,
+            # which is fine here, there's nothing to flush
+            threading.Timer(0.5, lambda: os._exit(0)).start()
 
         else:
             self.send_response(404)

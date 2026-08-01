@@ -50,8 +50,13 @@ cat > "${APP_PATH}/Contents/Info.plist" << 'PLIST'
   <string>AppIcon</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
+  <!-- Background agent, not a foreground GUI app — this bundle has no window
+       of its own (the real UI is the browser tab), so it never checks in
+       with the WindowServer the way macOS expects a normal app to. With
+       LSUIElement false, the Dock waits for that check-in forever and
+       bounces the icon indefinitely. -->
   <key>LSUIElement</key>
-  <false/>
+  <true/>
   <key>NSHighResolutionCapable</key>
   <true/>
 </dict>
