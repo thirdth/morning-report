@@ -17,9 +17,12 @@ mkdir -p "${APP_PATH}/Contents/MacOS"
 mkdir -p "${APP_PATH}/Contents/Resources"
 
 # ── 2. Write the launcher script ─────────────────────────────────────────────
+# exec replaces this shell with the python process (same PID) instead of
+# running it as a child — a Quit/kill signal to the app then reliably kills
+# the actual server too, instead of possibly orphaning it on port 5757.
 cat > "${APP_PATH}/Contents/MacOS/morning-report" << 'LAUNCHER'
 #!/bin/bash
-/usr/bin/python3 "$HOME/morning-report/morning_report.py"
+exec /usr/bin/python3 "$HOME/morning-report/morning_report.py"
 LAUNCHER
 
 chmod +x "${APP_PATH}/Contents/MacOS/morning-report"
